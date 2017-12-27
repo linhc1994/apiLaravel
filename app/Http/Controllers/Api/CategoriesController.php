@@ -37,10 +37,10 @@ class CategoriesController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            "supplier_id" => "required",
+           // "supplier_id" => "required",
             "name" => "required",
             "alias" => "required",
-            "parent_id" => "required"
+            //"parent_id" => "required"
         ]);
 
         $category  = Category::create($request->all());
@@ -80,10 +80,10 @@ class CategoriesController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            "supplier_id" => "required",
+            //"supplier_id" => "required",
             "name" => "required",
             "alias" => "required",
-            "parent_id" => "required"
+            //"parent_id" => "required"
         ]);
 
         $category  = Category::find($id)->update($request->all());
