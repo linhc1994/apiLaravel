@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Category;
+use App\User;
+use Hash;
 
-class CategoriesController extends Controller
+class UsersController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +16,7 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Category::orderBy('id', 'ASC')->get(['id', 'name', 'alias', 'parent_id', 'created_at', 'updated_at']);
-        return response()->json($categories, 200);
+        return User::all();
     }
 
     /**
@@ -26,8 +26,7 @@ class CategoriesController extends Controller
      */
     public function create()
     {
-        /*$category  = Category::get(['id', 'name', 'parent_id']);
-        return response()->json($category, 200);*/
+        //
     }
 
     /**
@@ -39,13 +38,17 @@ class CategoriesController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            "name" => "required",
-            //"parent_id" => "required"
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+            'level' => 'required'
         ]);
+
         $input = $request->all();
-        $input['alias'] = changeTitle($input['name']);
-        $category = Category::create($input);
-        return response()->json($category, 201);
+        $input['password'] = Hash::make($input['password']);
+
+        $user = User::create($input);
+        return response()->json($user, 201);
     }
 
     /**
@@ -56,8 +59,8 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
-        return response()->json($category, 200);
+        $user = User::find($id);
+        return response()->json($user, 200);
     }
 
     /**
@@ -81,18 +84,26 @@ class CategoriesController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            "name" => "required",
-            //"parent_id" => "required"
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'password' => 'required|min:6|confirmed',
+            'level' => 'required'
         ]);
 
         $input = $request->all();
-        $input['alias'] = changeTitle($input['name']);
-        $category = Category::find($id)->update($input);
-        if($category){
-            $category = Category::find($id);
-            return response()->json($category, 200);
+        if(!empty($input['password'])){ 
+            $input['password'] = Hash::make($input['password']);
         }else{
-            return response()->json($category, 403);
+            $input = array_except($input,array('password'));    
+        }
+
+        $user = User::find($id)->update($input);
+
+        if($user){
+            $user = User::find($id);
+            return response()->json($user, 200);
+        }else{
+            return response()->json($user, 403);
         }
     }
 
@@ -104,7 +115,7 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        Category::find($id)->delete();
+        User::find($id)->delete();
         return response()->json(null, 204);
     }
 }

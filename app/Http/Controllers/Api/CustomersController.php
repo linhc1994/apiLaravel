@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Category;
+use App\Customer;
 
-class CategoriesController extends Controller
+class CustomersController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +15,7 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Category::orderBy('id', 'ASC')->get(['id', 'name', 'alias', 'parent_id', 'created_at', 'updated_at']);
-        return response()->json($categories, 200);
+        return Customer::all();
     }
 
     /**
@@ -26,8 +25,7 @@ class CategoriesController extends Controller
      */
     public function create()
     {
-        /*$category  = Category::get(['id', 'name', 'parent_id']);
-        return response()->json($category, 200);*/
+        //
     }
 
     /**
@@ -40,12 +38,14 @@ class CategoriesController extends Controller
     {
         $this->validate($request, [
             "name" => "required",
-            //"parent_id" => "required"
+            "gender" => "required",
+            "email" => "required|email|unique:customers,email",
+            "phone" => "required",
+            "address" => "required",
         ]);
-        $input = $request->all();
-        $input['alias'] = changeTitle($input['name']);
-        $category = Category::create($input);
-        return response()->json($category, 201);
+
+        $customer = Customer::create($request->all());
+        return response()->json($customer, 201);
     }
 
     /**
@@ -56,8 +56,8 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
-        return response()->json($category, 200);
+        $customer = Customer::find($id);
+        return response()->json($customer, 200);
     }
 
     /**
@@ -82,17 +82,18 @@ class CategoriesController extends Controller
     {
         $this->validate($request, [
             "name" => "required",
-            //"parent_id" => "required"
+            "gender" => "required",
+            "email" => "required|email|unique:customers,email",
+            "phone" => "required",
+            "address" => "required",
         ]);
 
-        $input = $request->all();
-        $input['alias'] = changeTitle($input['name']);
-        $category = Category::find($id)->update($input);
-        if($category){
-            $category = Category::find($id);
-            return response()->json($category, 200);
+        $customer = Customer::find($id)->update($request->all());
+        if($customer){
+            $customer = Customer::find($id);
+            return response()->json($customer, 200);
         }else{
-            return response()->json($category, 403);
+            return response()->json($customer, 403);
         }
     }
 
@@ -104,7 +105,7 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        Category::find($id)->delete();
+        Customer::find($id)->delete();
         return response()->json(null, 204);
     }
 }

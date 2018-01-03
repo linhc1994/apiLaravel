@@ -20,7 +20,7 @@ Route::post('refresh', 'Api\Auth\LoginController@refresh');
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', 'Api\Auth\LoginController@logout');
     Route::get('posts', 'Api\PostController@index');
-    Route::resource('supplier', 'Api\SupplierController', 
+    Route::resource('brands', 'Api\BrandsController', 
     	[
     		'only' => ['index', 'show', 'store', 'update', 'destroy']	
 		],
@@ -33,11 +33,31 @@ Route::middleware('auth:api')->group(function () {
     		'only' => ['index', 'show', 'store', 'update', 'destroy']	
 		],
 		[
-			'except' => ['create', 'edit']
+			'except' => ['edit']
 	    ]
 	);
-	/*Route::resource('supplier', 'Api\SupplierController', ['except' => [
-	    'create', 'edit'
-	]]);*/
-	//Route::resource('supplier', 'Api\SupplierController');
+	Route::resource('users', 'Api\UsersController', 
+    	[
+    		'only' => ['index', 'show', 'store', 'update', 'destroy']	
+		],
+		[
+			'except' => ['edit']
+	    ]
+	);
+	Route::resource('customers', 'Api\CustomersController', 
+    	[
+    		'only' => ['index', 'show', 'store', 'update', 'destroy']	
+		],
+		[
+			'except' => ['edit']
+	    ]
+	);
+	Route::resource('products', 'Api\ProductsController', 
+    	[
+    		'only' => ['index', 'show', 'store', 'update', 'destroy']	
+		],
+		[
+			'except' => ['edit']
+	    ]
+	);
 });

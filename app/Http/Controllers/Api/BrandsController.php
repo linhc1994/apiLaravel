@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Category;
+use App\Brands;
 
-class CategoriesController extends Controller
+class BrandsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +15,7 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Category::orderBy('id', 'ASC')->get(['id', 'name', 'alias', 'parent_id', 'created_at', 'updated_at']);
-        return response()->json($categories, 200);
+        return Brands::all();
     }
 
     /**
@@ -26,8 +25,7 @@ class CategoriesController extends Controller
      */
     public function create()
     {
-        /*$category  = Category::get(['id', 'name', 'parent_id']);
-        return response()->json($category, 200);*/
+        //
     }
 
     /**
@@ -40,12 +38,14 @@ class CategoriesController extends Controller
     {
         $this->validate($request, [
             "name" => "required",
-            //"parent_id" => "required"
+            "email" => "required|email|unique:customers,email",
+            "address" => "required",
+            "alias" => "required",
         ]);
         $input = $request->all();
         $input['alias'] = changeTitle($input['name']);
-        $category = Category::create($input);
-        return response()->json($category, 201);
+        $brands = Brands::create($input);
+        return response()->json($brands, 201);
     }
 
     /**
@@ -56,8 +56,8 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
-        return response()->json($category, 200);
+        $brand = Brands::find($id);
+        return response()->json($brand, 200);
     }
 
     /**
@@ -82,17 +82,18 @@ class CategoriesController extends Controller
     {
         $this->validate($request, [
             "name" => "required",
-            //"parent_id" => "required"
+            "email" => "required|email|unique:brands,email",
+            "address" => "required",
+            "alias" => "required",
         ]);
-
         $input = $request->all();
         $input['alias'] = changeTitle($input['name']);
-        $category = Category::find($id)->update($input);
-        if($category){
-            $category = Category::find($id);
-            return response()->json($category, 200);
+        $brand = Brands::find($id)->update($input);
+        if($brand){
+            $brand = Brands::find($id);
+            return response()->json($brand, 200);
         }else{
-            return response()->json($category, 403);
+            return response()->json($brand, 403);
         }
     }
 
@@ -104,7 +105,7 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        Category::find($id)->delete();
+        Brands::find($id)->delete();
         return response()->json(null, 204);
     }
 }
