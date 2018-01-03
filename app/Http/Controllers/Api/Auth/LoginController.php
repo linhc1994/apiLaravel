@@ -17,7 +17,7 @@ class LoginController extends Controller
 	private $client;
 
 	public function __construct(){
-		$this->client = Client::find(1);
+		$this->client = Client::where('name', 'LIKE', '%Password Grant Client')->first();
 	}
     public function login(Request $request){
     	$this->validate($request, [

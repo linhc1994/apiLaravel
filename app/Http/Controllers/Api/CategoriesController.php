@@ -40,7 +40,7 @@ class CategoriesController extends Controller
     {
         $this->validate($request, [
             "name" => "required",
-            //"parent_id" => "required"
+            "parent_id" => "required"
         ]);
         $input = $request->all();
         $input['alias'] = changeTitle($input['name']);
@@ -57,7 +57,9 @@ class CategoriesController extends Controller
     public function show($id)
     {
         $category = Category::find($id);
-        return response()->json($category, 200);
+        if(!empty($category))
+            return response()->json($category, 200);
+        throw new \Exception("Id is not found!");
     }
 
     /**
@@ -82,7 +84,7 @@ class CategoriesController extends Controller
     {
         $this->validate($request, [
             "name" => "required",
-            //"parent_id" => "required"
+            "parent_id" => "required"
         ]);
 
         $input = $request->all();
@@ -104,7 +106,16 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        Category::find($id)->delete();
-        return response()->json(null, 204);
+        $category = Category::find($id);
+        if(!empty($category)){
+            try {
+                $category->delete();
+                return response()->json(null, 204);
+            } catch (\Exception $exception) {
+                throw $exception;
+            }
+        }else{
+            throw new \Exception("Id is not found!");
+        }
     }
 }

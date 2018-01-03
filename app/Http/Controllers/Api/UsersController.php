@@ -60,7 +60,9 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-        return response()->json($user, 200);
+        if(!empty($user))
+            return response()->json($user, 200);
+        throw new \Exception("Id is not found!");
     }
 
     /**
@@ -115,7 +117,16 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        User::find($id)->delete();
-        return response()->json(null, 204);
+        $user = User::find($id);
+        if(!empty($user)){
+            try {
+                $user->delete();
+                return response()->json(null, 204);
+            } catch (\Exception $exception) {
+                throw $exception;
+            }
+        }else{
+            throw new \Exception("Id is not found!");
+        }
     }
 }

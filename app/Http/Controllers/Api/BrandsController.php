@@ -40,7 +40,6 @@ class BrandsController extends Controller
             "name" => "required",
             "email" => "required|email|unique:customers,email",
             "address" => "required",
-            "alias" => "required",
         ]);
         $input = $request->all();
         $input['alias'] = changeTitle($input['name']);
@@ -57,7 +56,9 @@ class BrandsController extends Controller
     public function show($id)
     {
         $brand = Brands::find($id);
-        return response()->json($brand, 200);
+        if(!empty($brand))
+            return response()->json($brand, 200);
+        throw new \Exception("Id is not found!");
     }
 
     /**
@@ -84,7 +85,6 @@ class BrandsController extends Controller
             "name" => "required",
             "email" => "required|email|unique:brands,email",
             "address" => "required",
-            "alias" => "required",
         ]);
         $input = $request->all();
         $input['alias'] = changeTitle($input['name']);
@@ -105,7 +105,16 @@ class BrandsController extends Controller
      */
     public function destroy($id)
     {
-        Brands::find($id)->delete();
-        return response()->json(null, 204);
+        $brand = Brands::find($id);
+        if(!empty($brand)){
+            try {
+                $brand->delete();
+                return response()->json(null, 204);
+            } catch (\Exception $exception) {
+                throw $exception;
+            }
+        }else{
+            throw new \Exception("Id is not found!");
+        }
     }
 }

@@ -16,7 +16,7 @@ class RegisterController extends Controller
     private $client;
 
     public function __construct(){
-        $this->client = Client::find(1);
+        $this->client = Client::where('name', 'LIKE', '%Password Grant Client')->first();
     }
     public function register(Request $request){
         $this->validate($request, [

@@ -41,7 +41,7 @@ class ProductsController extends Controller
         $this->validate($request, [
             "name" => "required",
             "price" => "required",
-            "intro" => "required|email|unique:customers,email",
+            "intro" => "required",
             "content" => "required",
             "fImages" => "required",
         ]);
@@ -80,12 +80,16 @@ class ProductsController extends Controller
     public function show($id)
     {
         $product = Product::find($id);
-        $productImages = $product->productImages();
-        $products = [
-            "product" => $product,
-            "productImages" => $productImages
-        ];
-        return response()->json($products, 200);
+        if(!empty($product)){
+            $productImages = $product->productImages();
+            $products = [
+                "product" => $product,
+                "productImages" => $productImages
+            ];
+            return response()->json($user, 200);
+        }else{
+            throw new \Exception("Id is not found!");
+        }
     }
 
     /**
@@ -111,38 +115,41 @@ class ProductsController extends Controller
         $this->validate($request, [
             "name" => "required",
             "price" => "required",
-            "intro" => "required|email|unique:customers,email",
+            "intro" => "required",
             "content" => "required",
             "fImages" => "required",
         ]);
 
         $product = Product::find($id);
+        if(!empty($product)){
+            $files = $request->file('fImages');
 
-        $files = $request->file('fImages');
-
-        $product->name = $request->name;
-        $product->alias = changeTitle($request->name);
-        $product->price = $request->price;
-        $product->intro = $request->intro;
-        $product->content = $request->content;
-        $product->keywords = $request->keywords;
-        $product->descriptions = $request->descriptions;
-        $product->user_id = $request->user_id;
-        $product->cate_id = $request->cate_id;
-        
-        $imgCurrent = 'resource/uploads/detail/'.Request::input('imgCurrent');
-        if(!empty($files)){
-            $fileName = $files->getClientOriginalName();
-            $product->image = $fileName;
-            $files->move('resource/uploads/detail/', $fileName);
-            if(File::exists($imgCurrent)){
-                File::delete($imgCurrent);
+            $product->name = $request->name;
+            $product->alias = changeTitle($request->name);
+            $product->price = $request->price;
+            $product->intro = $request->intro;
+            $product->content = $request->content;
+            $product->keywords = $request->keywords;
+            $product->descriptions = $request->descriptions;
+            $product->user_id = $request->user_id;
+            $product->cate_id = $request->cate_id;
+            
+            $imgCurrent = 'resource/uploads/detail/'.Request::input('imgCurrent');
+            if(!empty($files)){
+                $fileName = $files->getClientOriginalName();
+                $product->image = $fileName;
+                $files->move('resource/uploads/detail/', $fileName);
+                if(File::exists($imgCurrent)){
+                    File::delete($imgCurrent);
+                }
+            }else{
+                throw new \Exception("Files is not define!");
             }
+            $product->save(); 
+            return response()->json($product, 201);
         }else{
-            echo "files is not define!";
+            throw new \Exception("Id is not found!");
         }
-        $product->save(); 
-        return response()->json($product, 201);
     }
 
     /**
@@ -154,12 +161,21 @@ class ProductsController extends Controller
     public function destroy($id)
     {
         $productDetails =  Product::find($id)->productImages()->toArray();
-        foreach ($productDetails as $product) {
-            File::delete('resource/uploads/detail/'.$Product["image"]);
+        if(!empty($productDetails)){
+            foreach ($productDetails as $product) {
+                File::delete('resource/uploads/detail/'.$Product["image"]);
+            }
+            $products = Product::find($id);
+            File::delete('resource/uploads/'.$products->image);
+
+            try {
+                $Products->delete();
+                return response()->json(null, 204);
+            } catch (\Exception $exception) {
+                throw $exception;
+            }
+        }else{
+            throw new \Exception("Id is not found!");
         }
-        $products = Product::find($id);
-        File::delete('resource/uploads/'.$products->image);
-        $Products->delete();
-        return response()->json(null, 204);
     }
 }

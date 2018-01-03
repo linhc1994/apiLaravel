@@ -57,7 +57,9 @@ class CustomersController extends Controller
     public function show($id)
     {
         $customer = Customer::find($id);
-        return response()->json($customer, 200);
+        if(!empty($customer))
+            return response()->json($customer, 200);
+        throw new \Exception("Id is not found!");
     }
 
     /**
@@ -105,7 +107,16 @@ class CustomersController extends Controller
      */
     public function destroy($id)
     {
-        Customer::find($id)->delete();
-        return response()->json(null, 204);
+        $customer = Customer::find($id);
+        if(!empty($customer)){
+            try {
+                $customer->delete();
+                return response()->json(null, 204);
+            } catch (\Exception $exception) {
+                throw $exception;
+            }
+        }else{
+            throw new \Exception("Id is not found!");
+        }
     }
 }
